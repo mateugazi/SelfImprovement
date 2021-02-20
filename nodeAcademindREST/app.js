@@ -2,11 +2,21 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+
+mongoose.connect('mongodb+srv://admin:admin@nodeacademindrest.3i7s0.mongodb.net/nodeAcademindREST?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }).then(() => console.log("connected")).catch(err => console.log(err))
+
+mongoose.Promise = global.Promise
 
 const productRoutes = require('./api/routes/products')
 const orderRoutes = require('./api/routes/orders')
+const userRoutes = require('./api/routes/user')
 
 app.use(morgan('dev'))
+app.use('/uploads', express.static('uploads'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
@@ -24,10 +34,11 @@ app.use((req, res, next) => {
 
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/user', userRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
-    error.status = 404;
+    error.status = 404; 
     next(error)
 })
 
